@@ -25,7 +25,7 @@ const createLyricsNode = async (mp3) => {
 const createDescriptionNode = async (artist, role, mp3) => {
   const roleUppered = role
     .replace(/[,.:;&-/]/g, '_')
-    .replace(/\s/g, 'second')
+    .replace(/\s/g, '_')
     .replace(/2nd/g, 'second')
     .replace(/___/g, '_')
     .replace(/__/g, '_')
@@ -66,10 +66,10 @@ const createMp3Node = async () => {
       mp3_id: mp3Id,
     } = mp3;
     console.log(`creating node and relationships of ${name} (${perma})`);
-    const query = `MATCH (a:Artist {perma: $artistPerma})
-      MERGE (n:Mp3 {name: $name, perma: $perma, likes: $likes, dislikes: $dislikes, plays: $plays, dateAdded: $dateAdded, mp3Id: $mp3Id})<-[r:VOCALIST]-(a)`;
+    const query = `MERGE (n:Mp3 {
+      name: $name, perma: $perma, likes: $likes, dislikes: $dislikes, plays: $plays, dateAdded: $dateAdded, mp3Id: $mp3Id
+    })`;
     const params = {
-      artistPerma,
       name,
       perma,
       likes,
@@ -80,6 +80,14 @@ const createMp3Node = async () => {
     };
 
     await session.run(query, params);
+
+    const relationQuery = 'MATCH (a:Artist {perma: $artistPerma}), (n:Mp3 {perma: $perma}) MERGE (n)<-[r:VOCALIST]-(a)';
+    const relationParams = {
+      artistPerma,
+      perma,
+    };
+
+    await session.run(relationQuery, relationParams);
 
     if (mp3.album) {
       await createAlbumNode(mp3);
