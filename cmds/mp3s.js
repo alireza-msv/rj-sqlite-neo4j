@@ -107,7 +107,9 @@ const createMp3Node = async () => {
       .where({ perma });
     console.log('done');
 
-    createMp3Node();
+    setTimeout(() => {
+      createMp3Node();
+    }, 1000);
   } else {
     console.log('no unmerged mp3 found');
     await driver.close();

@@ -18,7 +18,9 @@ const createArtistNode = async () => {
       .where({ perma })
       .update({ status: 'MERGED' });
 
-    createArtistNode();
+    setTimeout(() => {
+      createArtistNode();
+    }, 1000);
   } else {
     console.log('no unmerged artist found');
     await driver.close();

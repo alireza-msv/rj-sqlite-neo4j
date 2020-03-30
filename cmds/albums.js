@@ -24,7 +24,10 @@ const createAlbumsNode = async () => {
       .where({ perma: album.perma });
 
     console.log('done');
-    createAlbumsNode();
+
+    setTimeout(() => {
+      createAlbumsNode();
+    }, 1000);
   } else {
     await driver.session();
     console.log('No unmerged album found');
