@@ -23,29 +23,43 @@ const createLyricsNode = async (mp3) => {
 };
 
 const createDescriptionNode = async (artist, role, mp3) => {
-  const roleUppered = role
-    .replace(/[,.:;&-/]/g, '_')
-    .replace(/\s/g, '_')
-    .replace(/2nd/g, 'second')
-    .replace(/___/g, '_')
-    .replace(/__/g, '_')
-    .toUpperCase();
-  const descQuery = 'MERGE (a:Artist {name: $artistName, perma: $artistPerma})';
-  const descParams = {
-    artistPerma: artist.trim().replace(/\s/g, '+'),
-    artistName: artist.trim(),
-  };
+  if (role.includes(',')) {
+    const roles = role.split(',');
 
-  await session.run(descQuery, descParams);
+    for (let i = 0; i < roles.length; i += 1) {
+      await createDescriptionNode(artist, roles[i], mp3);
+    }
+  } else if (artist.includes(',')) {
+    const artists = artist.split(',');
 
-  const relQuery = `MATCH (m:Mp3 {perma: $perma}),
-  (a:Artist {perma: $artistPerma}) MERGE (m)<-[r:${roleUppered}]-(a)`;
-  const relParams = {
-    perma: mp3.perma,
-    artistPerma: artist.trim().replace(/\s/g, '+'),
-  };
+    for (let i = 0; i < artists.length; i += 1) {
+      await createDescriptionNode(artists[i], role, mp3);
+    }
+  } else {
+    const roleUppered = role
+      .replace(/[,.:;&-/]/g, '_')
+      .replace(/\s/g, '_')
+      .replace(/2nd/g, 'second')
+      .replace(/___/g, '_')
+      .replace(/__/g, '_')
+      .toUpperCase();
+    const descQuery = 'MERGE (a:Artist {name: $artistName, perma: $artistPerma})';
+    const descParams = {
+      artistPerma: artist.trim().replace(/\s/g, '+'),
+      artistName: artist.trim(),
+    };
 
-  await session.run(relQuery, relParams);
+    await session.run(descQuery, descParams);
+
+    const relQuery = `MATCH (m:Mp3 {perma: $perma}),
+    (a:Artist {perma: $artistPerma}) MERGE (m)<-[r:${roleUppered}]-(a)`;
+    const relParams = {
+      perma: mp3.perma,
+      artistPerma: artist.trim().replace(/\s/g, '+'),
+    };
+
+    await session.run(relQuery, relParams);
+  }
 };
 
 const createMp3Node = async () => {
@@ -81,7 +95,8 @@ const createMp3Node = async () => {
 
     await session.run(query, params);
 
-    const relationQuery = 'MATCH (a:Artist {perma: $artistPerma}), (n:Mp3 {perma: $perma}) MERGE (n)<-[r:VOCALIST]-(a)';
+    const relationQuery = `MATCH (a:Artist {perma: $artistPerma}), (n:Mp3 {perma: $perma})
+      MERGE (a)-[r:VOCALIST]->(n)`;
     const relationParams = {
       artistPerma,
       perma,
