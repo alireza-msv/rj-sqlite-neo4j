@@ -12,9 +12,9 @@ const createAlbumsNode = async () => {
     console.log(`creating node and relationships of ${name}(${perma})`);
     const query = 'MATCH (a:Artist {perma: $artistPerma}) MERGE (n:Album {name: $name, perma: $perma, thumb: $thumb})<-[r:ARTIST]-(a)';
     const params = {
-      artistPerma: album.artist_perma,
+      artistPerma: decodeURIComponent(album.artist_perma),
       name,
-      perma,
+      perma: decodeURIComponent(perma),
       thumb,
     };
 

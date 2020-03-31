@@ -11,7 +11,7 @@ const createArtistNode = async () => {
     const [{ name, perma, thumb }] = artists;
     console.log(`creating node for ${name} (${perma})`);
     const query = 'MERGE (a:Artist {name: $name, perma: $perma, thumb: $thumb}) RETURN a';
-    const params = { name, perma, thumb };
+    const params = { name, perma: decodeURIComponent(perma), thumb };
 
     await session.run(query, params);
     await knex('artists')
