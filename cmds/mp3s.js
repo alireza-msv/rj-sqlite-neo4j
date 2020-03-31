@@ -98,7 +98,7 @@ const createMp3Node = async () => {
     const relationQuery = `MATCH (a:Artist {perma: $artistPerma}), (n:Mp3 {perma: $perma})
       MERGE (a)-[r:VOCALIST]->(n)`;
     const relationParams = {
-      artistPerma: decodeURIComponent(perma),
+      artistPerma: decodeURIComponent(artistPerma),
       perma,
     };
 
