@@ -20,7 +20,7 @@ const createArtistNode = async () => {
 
     setTimeout(() => {
       createArtistNode();
-    }, 1000);
+    }, 500);
   } else {
     console.log('no unmerged artist found');
     await driver.close();

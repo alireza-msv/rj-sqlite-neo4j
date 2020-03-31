@@ -132,7 +132,7 @@ const createMp3Node = async () => {
 
     setTimeout(() => {
       createMp3Node();
-    }, 1000);
+    }, 500);
   } else {
     console.log('no unmerged mp3 found');
     await driver.close();

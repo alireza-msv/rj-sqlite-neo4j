@@ -27,7 +27,7 @@ const createAlbumsNode = async () => {
 
     setTimeout(() => {
       createAlbumsNode();
-    }, 1000);
+    }, 500);
   } else {
     await driver.session();
     console.log('No unmerged album found');
